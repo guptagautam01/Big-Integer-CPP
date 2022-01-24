@@ -11,7 +11,7 @@ class BigInt {
     int base; 
     long long int pow10;
 
-    void readString (string &str){
+    void readString (const string &str){
         //remove any previous value
         a.clear();
         if(str.empty()) return;
@@ -50,13 +50,13 @@ class BigInt {
         pow10 = 1000000000;
         sign = 1;
     }
-    BigInt (string s){
+    BigInt (const string s){
         base = 9;
         pow10 = 1000000000;
         sign = 1;
         readString(s);
     }
-    BigInt (long long int num){
+    BigInt (const long long int num){
         base = 9;
         pow10 = 1000000000;
         sign = num >= 0;
@@ -64,7 +64,7 @@ class BigInt {
         readString(s);
     }
 
-    void printVector (){
+    void printVector () const{
         //temporary function
         for(int i: a){
             cout << i << " ";
@@ -72,7 +72,7 @@ class BigInt {
         cout << endl;
     }
 
-    void print (){
+    void print () const{
         if(!sign){
             cout << "-";
         }
@@ -84,6 +84,54 @@ class BigInt {
     void update(string s){
         readString (s);
     }
+
+    bool operator== (const BigInt &b1) const{
+        return this->sign == b1.sign and this->a == b1.a;
+    }
+    BigInt operator - () const{
+        BigInt ans = *this;
+        ans.sign = !ans.sign;
+        return ans;
+    }
+    BigInt operator+ () const{
+        return this;
+    }
+    BigInt operator+ (const BigInt &b1) const{
+        if(b1.sign != this->sign){
+            return *this - (-b1);
+        }
+        BigInt ans;
+        ans.sign = this->sign;
+        long long int carry = 0;
+        for(int i=0; i<min(this->a.size(), b1.a.size()); i++){
+            long long int temp = b1.a[i] + this->a[i] + carry;
+            ans.a.push_back(temp % pow10);
+            carry = temp / pow10;
+        }
+        //this is longer
+        for(int i=min(this->a.size(), b1.a.size()); i<this->a.size(); i++){
+            long long int temp = this->a[i] + carry;
+            ans.a.push_back(temp % pow10);
+            carry = temp / pow10;
+        }
+        //b1 is longer
+        for(int i=min(this->a.size(), b1.a.size()); i<b1.a.size(); i++){
+            long long int temp = this->a[i] + carry;
+            ans.a.push_back(temp % pow10);
+            carry = temp / pow10;
+        }
+        while(carry != 0){
+            ans.a.push_back(carry % pow10);
+            carry = carry / pow10;
+        }
+
+    }
+    BigInt operator- (const BigInt &b1) const{
+        //TODO
+        BigInt ans;
+        return ans;
+    }
+
 };
 
 istream& operator >> (istream &is, BigInt &num){
