@@ -129,6 +129,7 @@ class BigInt {
     BigInt operator- (const BigInt &b1) const{
         //TODO
         BigInt ans;
+        //Check sign
         return ans;
     }
 
