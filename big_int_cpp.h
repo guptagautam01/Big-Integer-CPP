@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include <cmath>
+#include <iomanip>
 
 using namespace std;
 
@@ -79,9 +80,11 @@ class BigInt {
         if(!sign){
             cout << "-";
         }
-        
-        for(int i = a.size()-1; i>=0 ; i--){
-            cout << a[i];
+        int i = a.size()-1;
+        //Dealing with this part seperately as the first part of number does not require leading zeros
+        cout << a[i--]; 
+        for( ; i>=0 ; i--){
+            cout << setw(base) << setfill('0') << a[i];
         }
     }
     void update(string s){
