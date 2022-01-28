@@ -41,7 +41,10 @@ class BigInt {
         while(!a.empty() and a.back()==0){
             a.pop_back();
         }
-        if(a.empty())   sign = 1;
+        if(a.empty()){
+            sign = 1;
+            a.push_back(0);
+        }
     }
 
     public:
@@ -88,13 +91,13 @@ class BigInt {
     bool operator== (const BigInt &b1) const{
         return this->sign == b1.sign and this->a == b1.a;
     }
-    BigInt operator - () const{
+    BigInt operator- () const{
         BigInt ans = *this;
         ans.sign = !ans.sign;
         return ans;
     }
     BigInt operator+ () const{
-        return this;
+        return *this;
     }
     BigInt operator+ (const BigInt &b1) const{
         if(b1.sign != this->sign){
@@ -116,7 +119,7 @@ class BigInt {
         }
         //b1 is longer
         for(int i=min(this->a.size(), b1.a.size()); i<b1.a.size(); i++){
-            long long int temp = this->a[i] + carry;
+            long long int temp = b1.a[i] + carry;
             ans.a.push_back(temp % pow10);
             carry = temp / pow10;
         }
@@ -124,15 +127,115 @@ class BigInt {
             ans.a.push_back(carry % pow10);
             carry = carry / pow10;
         }
-
-    }
-    BigInt operator- (const BigInt &b1) const{
-        //TODO
-        BigInt ans;
-        //Check sign
         return ans;
     }
-
+    BigInt operator- (const BigInt &b1) const{
+        //Check sign
+        if(b1.sign != this->sign){
+            return *this + (-b1);
+        }
+        if(*this == b1){
+            return (BigInt)"0";
+        }
+        BigInt ans;
+        if(this->abs() > b1.abs()){
+            ans = *this;
+            for(int i=0; i<ans.a.size(); i++){
+                if(i==b1.a.size()){
+                    break;
+                }
+                ans.a[i] -= b1.a[i];
+                if(ans.a[i] < 0 and i!=ans.a.size()-1){
+                    ans.a[i] += pow10;
+                    ans.a[i+1] -= 1;
+                }
+            }
+        }
+        else{
+            ans = -b1;
+            for(int i=0; i<ans.a.size(); i++){
+                if(i==this->a.size()){
+                    break;
+                }
+                ans.a[i] -= this->a[i];
+                if(ans.a[i] < 0 and i!=ans.a.size()-1){
+                    ans.a[i] += pow10;
+                    ans.a[i+1] -= 1;
+                }
+            }
+        }
+        ans.removeZero();
+        return ans;
+    }
+    BigInt abs() const{
+        BigInt b1 = *this;
+        b1.sign = 1;
+        return b1;
+    }
+    bool operator< (const BigInt &b1) const{
+        //Evaluating this < b1
+        if(this->sign != b1.sign){
+            return this->sign < b1.sign;
+        }
+        if(this->a.size() != b1.a.size()){
+            return this->a.size() < b1.a.size();
+        }
+        for(int i=(this->a.size())-1; i>=0; i--){
+            if(this->a[i]!=b1.a[i]){
+                return this->a[i] < b1.a[i];
+            }
+        }
+        //Both of the numbers are equal
+        return false;
+    } 
+    bool operator<= (const BigInt &b1) const{
+        //Evaluating this < b1
+        if(this->sign != b1.sign){
+            return this->sign < b1.sign;
+        }
+        if(this->a.size() != b1.a.size()){
+            return this->a.size() < b1.a.size();
+        }
+        for(int i=(this->a.size())-1; i>=0; i--){
+            if(this->a[i]!=b1.a[i]){
+                return this->a[i] < b1.a[i];
+            }
+        }
+        //Both of the numbers are equal
+        return true;
+    }
+    bool operator> (const BigInt &b1) const{
+        //Evaluating this < b1
+        if(this->sign != b1.sign){
+            return this->sign > b1.sign;
+        }
+        if(this->a.size() != b1.a.size()){
+            return this->a.size() > b1.a.size();
+        }
+        for(int i=(this->a.size())-1; i>=0; i--){
+            if(this->a[i]!=b1.a[i]){
+                return this->a[i] > b1.a[i];
+            }
+        }
+        //Both of the numbers are equal
+        return false;
+    }
+    bool operator>= (const BigInt &b1) const{
+        //Evaluating this < b1
+        if(this->sign != b1.sign){
+            return this->sign > b1.sign;
+        }
+        if(this->a.size() != b1.a.size()){
+            return this->a.size() > b1.a.size();
+        }
+        for(int i=(this->a.size())-1; i>=0; i--){
+            if(this->a[i]!=b1.a[i]){
+                return this->a[i] > b1.a[i];
+            }
+        }
+        //Both of the numbers are equal
+        return true;
+    }
 };
 
 istream& operator >> (istream &is, BigInt &num){
